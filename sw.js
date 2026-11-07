@@ -1,6 +1,6 @@
 // まいにち おりがみ:オフラインで うごかすための しくみ
 // アプリを こうしんしたら VERSION の すうじを 1つ ふやす
-const VERSION = "v1";
+const VERSION = "v3";
 const APP = "origami-" + VERSION;
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(APP).then(c => c.addAll(FILES))); self.skipWaiting(); });
