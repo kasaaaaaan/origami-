@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>まいにち おりがみ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F08A24">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF2F6; --surface:#FFFFFF; --ink:#1F2733; --sub:#5E6977; --line:#D6DEE6;
+  --chip:#E4EBF1; --accent:#2F6FD6; --go:#F08A24; --ok:#2E9E5B; --warn:#C0392B; --adult:#7B5CC9;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#13171D; --surface:#1D232C; --ink:#EEF2F6; --sub:#A3AEBB; --line:#323B47; --chip:#2A323D;
+  --accent:#6FA0F0; --go:#F59B3F; --ok:#5CC48A; --warn:#F07B6E; --adult:#A68BF0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13171D; --surface:#1D232C; --ink:#EEF2F6; --sub:#A3AEBB; --line:#323B47; --chip:#2A323D;
+  --accent:#6FA0F0; --go:#F59B3F; --ok:#5CC48A; --warn:#F07B6E; --adult:#A68BF0; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Rounded Mplus 1c","Hiragino Sans","Noto Sans JP",sans-serif;
+  font-weight:700;line-height:1.6;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+main{max-width:560px;margin:0 auto;padding:12px 16px 120px}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+img,video{max-width:100%;display:block}
+textarea,input,select{user-select:text;-webkit-user-select:text}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;min-height:44px}
+.date{color:var(--sub);font-size:15px}
+.adultbtn{border:0;background:var(--chip);border-radius:999px;padding:8px 14px;font-size:14px;color:var(--sub);position:relative;overflow:hidden}
+.adultbtn.on{background:var(--adult);color:#fff}
+.adultbtn .fill{position:absolute;inset:0;background:var(--adult);opacity:.35;transform-origin:left;transform:scaleX(0)}
+.adultbtn.hold .fill{transition:transform 1.1s linear;transform:scaleX(1)}
+.adultbar{background:var(--adult);color:#fff;border-radius:12px;padding:8px 14px;font-size:14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+
+/* paper */
+.paper{--c:#D9453B;background:var(--c);border-radius:6px;position:relative;display:grid;place-items:center;overflow:hidden;flex:none}
+.paper::after{content:"";position:absolute;right:0;top:0;width:24%;height:24%;background:linear-gradient(225deg,var(--bg) 50%,rgba(255,255,255,.55) 50%)}
+.paper.xl{width:min(64vw,260px);height:min(64vw,260px);font-size:min(30vw,120px)}
+.paper.md{width:84px;height:84px;font-size:44px}
+.paper.sm{width:48px;height:48px;font-size:26px}
+
+/* home */
+.daybadge{text-align:center;font-size:20px;color:var(--sub);margin:4px 0 10px}
+.daybadge b{font-size:44px;color:var(--ink);font-weight:900;margin-right:2px}
+.hero{display:flex;flex-direction:column;align-items:center;gap:14px;border:0;background:none;width:100%;padding:8px 0}
+.hero .nm{font-size:34px;font-weight:900;line-height:1.2}
+.bigplay{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:999px;background:var(--go);color:#fff;
+  font-size:30px;font-weight:900;padding:18px;box-shadow:0 6px 0 color-mix(in srgb,var(--go) 70%,#000);margin-top:6px}
+.bigplay:active{transform:translateY(4px);box-shadow:0 2px 0 color-mix(in srgb,var(--go) 70%,#000)}
+.sub{display:block;width:100%;margin-top:14px;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:14px;font-size:20px}
+.doneimg{border-radius:14px;max-height:260px;margin:0 auto}
+.muted{color:var(--sub);font-size:15px;font-weight:500}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);display:flex;justify-content:center}
+nav.tabs .in{display:flex;max-width:560px;width:100%}
+nav.tabs button{flex:1;border:0;background:none;padding:8px 4px 10px;font-size:14px;color:var(--sub)}
+nav.tabs button span{display:block;font-size:34px;line-height:1.15}
+nav.tabs button[aria-current="true"]{color:var(--ink)}
+nav.tabs button[aria-current="true"] span{transform:scale(1.15)}
+nav.tabs.hide{display:none}
+
+/* block */
+.block{background:var(--surface);border-radius:16px;padding:16px;margin:0 0 14px;border:1px solid var(--line)}
+.block h2{font-size:20px;margin:0 0 12px;font-weight:900}
+.btn{border:0;border-radius:999px;padding:12px 18px;background:var(--chip);font-size:16px}
+.btn.adult{background:var(--adult);color:#fff}
+.btn.warn{background:transparent;color:var(--warn);text-decoration:underline;padding:8px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+textarea,input[type=url],input[type=text],select{width:100%;font:inherit;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+input[type=file]{display:none}
+.note{font-size:13px;color:var(--sub);font-weight:500;margin:8px 0 0}
+.err{color:var(--warn);font-size:14px}
+
+/* play */
+.play{max-width:560px;margin:0 auto;padding:10px 16px 30px;min-height:100%;display:flex;flex-direction:column}
+.ptop{display:flex;align-items:center;gap:10px}
+.ptop .nm{flex:1;text-align:center;font-size:24px;font-weight:900}
+.round{border:0;border-radius:50%;width:72px;height:72px;font-size:30px;background:var(--chip);display:grid;place-items:center;flex:none}
+.round.sm{width:52px;height:52px;font-size:22px}
+.round.on{background:var(--accent);color:#fff}
+.round.big{width:112px;height:112px;font-size:50px;background:var(--go);color:#fff;box-shadow:0 6px 0 color-mix(in srgb,var(--go) 70%,#000)}
+.round.big:active{transform:translateY(4px);box-shadow:0 2px 0 color-mix(in srgb,var(--go) 70%,#000)}
+.round.big.done{background:var(--ok);box-shadow:0 6px 0 color-mix(in srgb,var(--ok) 70%,#000);font-size:46px}
+.round:disabled{opacity:.35}
+.stage{margin:12px auto 0;width:100%;max-width:min(92vw,440px,52vh)}
+.stage svg{width:100%;aspect-ratio:1;display:block;background:var(--chip);border-radius:18px}
+.stage video{width:100%;border-radius:18px;background:#000;max-height:52vh}
+.stepcard{aspect-ratio:1;background:var(--chip);border-radius:18px;display:grid;place-items:center;position:relative}
+.stepcard .num{position:absolute;top:14px;left:18px;font-size:44px;font-weight:900;color:var(--sub)}
+.ptext{font-size:26px;font-weight:900;text-align:center;margin:14px 0 6px;min-height:2.6em;line-height:1.35}
+.dots{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--go)}
+.pctrl{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:auto;padding-top:6px}
+@keyframes pulse{0%,100%{r:8;opacity:1}50%{r:13;opacity:.45}}
+.pulse{animation:pulse 1.1s ease-in-out infinite}
+
+/* record */
+.rtitle{text-align:center;margin:6px 0 14px}
+.rtitle .big{font-size:56px;line-height:1.1}
+.rtitle h1{font-size:30px;margin:4px 0 0;font-weight:900}
+.phototile{display:block;border:3px dashed var(--line);border-radius:18px;padding:22px;text-align:center;font-size:22px;color:var(--sub);background:var(--surface)}
+.phototile span{display:block;font-size:56px;line-height:1.2}
+.phototile img{border-radius:12px;margin:0 auto;max-height:280px}
+.qlabel{font-size:22px;font-weight:900;margin:22px 0 10px;text-align:center}
+.faces{display:flex;gap:10px}
+.face{flex:1;border:4px solid transparent;background:var(--surface);border-radius:20px;padding:10px 4px;font-size:15px}
+.face span{display:block;font-size:58px;line-height:1.15}
+.face[aria-pressed="true"]{border-color:var(--go);background:color-mix(in srgb,var(--go) 15%,var(--surface))}
+.nexts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nexts .face span{font-size:40px}
+details.adultbox{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
+details.adultbox summary{font-size:16px;color:var(--adult);cursor:pointer}
+.choice{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font-size:15px}
+.choice[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.savebtn{display:block;width:100%;margin-top:22px;border:0;border-radius:999px;background:var(--ok);color:#fff;font-size:30px;font-weight:900;padding:18px;box-shadow:0 6px 0 color-mix(in srgb,var(--ok) 70%,#000)}
+.savebtn:disabled{opacity:.5}
+
+/* celebrate */
+.celebrate{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);display:grid;place-items:center;text-align:center}
+@keyframes stamp{0%{transform:scale(3) rotate(-20deg);opacity:0}60%{transform:scale(.9) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.celebrate .paper{animation:stamp .7s cubic-bezier(.2,.8,.3,1.2) both}
+.celebrate h1{font-size:40px;margin:18px 0 0;font-weight:900}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.conf{position:fixed;top:-20px;width:14px;height:14px;border-radius:2px;animation:fall linear forwards}
+
+/* stamps */
+.headline{text-align:center;font-size:22px;margin:6px 0 14px}
+.headline b{font-size:48px;font-weight:900}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.stamp{aspect-ratio:1;border-radius:6px;background:var(--chip);display:grid;place-items:center;font-size:16px;color:var(--sub);overflow:hidden;border:0;padding:0}
+.stamp img{width:100%;height:100%;object-fit:cover}
+.stamp.on{color:#fff;font-size:30px}
+.stats{display:flex;gap:10px}
+.stat{flex:1;background:var(--chip);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:30px;font-weight:900;line-height:1.2}
+.stat small{font-size:12px;color:var(--sub)}
+.trend{display:flex;align-items:flex-end;gap:3px;height:60px;margin-top:6px;overflow-x:auto}
+.trend i{flex:0 0 10px;border-radius:3px 3px 0 0;background:var(--ok)}
+
+/* zukan */
+.lv{font-size:22px;margin:18px 0 8px;color:var(--go);letter-spacing:2px}
+.lv:first-of-type{margin-top:4px}
+.models{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mcard{border:2px solid var(--line);background:var(--surface);border-radius:18px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:18px;line-height:1.25;text-align:center}
+.mcard .s{font-size:13px;color:var(--sub);font-weight:500}
+.mcard.add{border-style:dashed;color:var(--adult);justify-content:center;min-height:150px}
+.mcard.add span{font-size:44px}
+
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.sheet-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sheet-head h2{flex:1;margin:0;font-size:22px;font-weight:900}
+.close{border:0;background:var(--chip);width:44px;height:44px;border-radius:50%;font-size:18px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:40px;height:40px;border-radius:8px;border:3px solid transparent}
+.sw[aria-pressed="true"]{border-color:var(--ink)}
+.emojis{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.em{border:2px solid transparent;background:var(--surface);border-radius:8px;font-size:24px;padding:4px 0}
+.em[aria-pressed="true"]{border-color:var(--accent)}
+label.f{display:block;font-size:15px;margin:14px 0 6px}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:16px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="tabs" id="tabs"><div class="in">
+  <button data-tab="home"><span>🏠</span>きょう</button>
+  <button data-tab="stamps"><span>⭐</span>スタンプ</button>
+  <button data-tab="zukan"><span>📚</span>ずかん</button>
+</div></nav>
+<div id="sheet"></div>
+<div id="fx"></div>
+<div id="toast"></div>
+
+<script>
+/* ===================== コンテンツ(ここに作品を ふやしていく) ===================== */
+const MODELS = {
+  sankaku:{name:"さんかく",e:"🔺",c:"#D9453B",lv:1,steps:["かどと かどを あわせる","はんぶんに おって さんかく","かおや もようを かいたら できあがり"],tip:"はじめての日は「かどを あわせる」だけ じぶんで できれば じゅうぶん。"},
+  shikaku:{name:"しかく",e:"🟦",c:"#2F6FD6",lv:1,steps:["へりと へりを あわせる","はんぶんに おって ながしかく","もういちど はんぶんで ちいさな しかく"],tip:"ゆびで おりめを「ぎゅー」と なぞる あそびに すると たのしい。"},
+  onigiri:{name:"おにぎり",e:"🍙",c:"#3A3F47",lv:1,steps:["いろの めんを うえにして さんかくに おる(しろが そとに でる)","りょうはしの かどを うしろに すこし おる","くろい かみを はって のりに する"],tip:"しろい ところが ごはん。のりは くろい かみを ちいさく きって はろう。"},
+  inu:{name:"いぬのかお",e:"🐶",c:"#C98A3D",lv:1,steps:["さんかくに おる(ながい へりが うえ)","りょうはしの かどを したに おって みみ","したの かどを すこし うえに おる","めと はなを かこう"],tip:"みみの おりかたを かえると ちがう いぬに なる。"},
+  neko:{name:"ねこのかお",e:"🐱",c:"#F2B61F",lv:1,steps:["さんかくに おる(ながい へりが した)","りょうはしの かどを うえに おりあげて みみ","うえの かどを うしろに おる","かおと ひげを かこう"],tip:"いぬの つぎに おると「にてる!」に きづける。"},
+  kitsune:{name:"きつね",e:"🦊",c:"#E57A2E",lv:1,steps:["さんかくに おる(ながい へりが うえ)","ひだりの かどを ななめうえに おりあげる(みみ)","みぎの かども ななめうえに おりあげる","かおを かこう"],tip:"できたら「コンコン」と こえを つけて あそぼう。"},
+  tulip:{name:"チューリップ",e:"🌷",c:"#E86FA3",lv:2,steps:["さんかくに おる(ながい へりが した)","りょうはしの かどを ななめうえに おりあげる","うらがえすと はなの できあがり","くきと はっぱを かこう(みどりの かみを はっても いい)"],tip:"かみに はって「はなばたけ」に していくと きろくに なる。"},
+  koppu:{name:"コップ",e:"🥤",c:"#3BA7A0",lv:2,steps:["さんかくに おる(ながい へりが した)","みぎの かどを ひだりの へりに あわせて おる","ひだりの かども みぎの へりに あわせて おる","うえの 1まいを まえに おりさげる","のこりの 1まいを うしろに おりさげる"],tip:"ほんとうに ものが はいる。ビーズや どんぐりを いれてみよう。"},
+  tree:{name:"クリスマスツリー",e:"🎄",c:"#2E9E5B",lv:2,steps:["みどりの かみを さんかくに おる(3まい)","すこしずつ ずらして かさねる","のりで はって ほしや かざりを かこう"],tip:"のりは おとなと いっしょに。"},
+  hikouki:{name:"かみひこうき",e:"✈️",c:"#5B8FE0",lv:3,steps:["たてに はんぶんに おって もどす","うえの かど 2つを まんなかの せんへ","ななめの へりを もういちど まんなかへ","まんなかで はんぶんに おる","はねを おりさげて ひろげたら とばそう"],tip:"とばす ところまでが おりがみ。そとで とばす日に するのも いい。"},
+  ouchi:{name:"おうち",e:"🏠",c:"#B5651D",lv:3,steps:["はんぶんに おる(おりめが うえ)","さらに はんぶんに おって おりめを つけ もどす","りょうはしを まんなかの せんに あわせて おる","うえの ふくろを ひらいて つぶし やねに する","まどや ドアを かこう"],tip:"「ふくろを ひらいて つぶす」は おとなが みせてから。"},
+  kabuto:{name:"かぶと",e:"⛑️",c:"#7B5CC9",lv:3,steps:["さんかくに おる(ながい へりが うえ)","りょうはしの かどを したの かどに あわせて おる","その かどを うえの かどまで おりあげる","さきを そとがわに ななめに おる(つの)","したの 1まいを 2かい おりあげる","のこりを うちがわに おりこんで できあがり"],tip:"しんぶんしで おおきく おると かぶれる。"},
+  pakupaku:{name:"パクパク",e:"👄",c:"#D9453B",lv:3,steps:["4つの かどを まんなかに あわせて おる","うらがえして また 4つの かどを まんなかへ","はんぶんに おって おりめを つける","したから ゆびを いれて パクパク"],tip:"なかに えを かくと うらない あそびに なる。"}
+};
+const COURSE = ["sankaku","shikaku","onigiri","inu","neko","inu","kitsune",
+  "tulip","koppu","neko","tulip","tree","koppu","kitsune",
+  "hikouki","ouchi","hikouki","tree","ouchi","tulip","koppu",
+  "kabuto","pakupaku","kabuto","ouchi","pakupaku","hikouki","kabuto","free","free"];
+const ANIMS={
+sankaku:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"うえの かどを したの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,20]},
+    {t:"かおを かいたら できあがり!",draw:[["c",95,148,6],["c",145,148,6],["p","M100 172 Q120 190 140 172"]]}
+  ]},
+  inu:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"うえの かどを したの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,20]},
+    {t:"ひだりの かどを したに おって みみ",fold:[[80,120],[45,145]],side:[20,120]},
+    {t:"みぎの かども したに おって みみ",fold:[[160,120],[195,145]],side:[220,120]},
+    {t:"したの かどを すこし うえに おる",fold:[[80,195],[160,195]],side:[120,220]},
+    {t:"めと はなを かいて できあがり!",draw:[["c",100,146,6],["c",140,146,6],["e",120,180,9,6]]}
+  ]},
+  shikaku:{shape:"square",steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"うえの へりを したの へりに あわせて おる",fold:[[10,120],[230,120]],side:[120,20]},
+    {t:"みぎの はしを ひだりの はしに あわせて おる",fold:[[120,110],[120,230]],side:[220,170]},
+    {t:"ちいさな しかくの できあがり!"}]},
+  onigiri:{start:"color",steps:[
+    {t:"いろの めんを うえに して はじめよう"},
+    {t:"したの かどを うえの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,220]},
+    {t:"ひだりの かどを うしろに すこし おる",fold:[[52,80],[52,130]],side:[30,110],back:true},
+    {t:"みぎの かども うしろに すこし おる",fold:[[188,80],[188,130]],side:[210,110],back:true},
+    {t:"くろい かみを はって のりに したら できあがり!",draw:[["g","M92 92 L148 92 L148 120 L92 120 Z","#2B2F36"]]}]},
+  neko:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"したの かどを うえの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,220]},
+    {t:"ひだりの かどを うえに おりあげて みみ",fold:[[80,120],[50,90]],side:[20,120]},
+    {t:"みぎの かども おりあげて みみ",fold:[[160,120],[190,90]],side:[220,120]},
+    {t:"うえの かどを うしろに おる",fold:[[10,70],[230,70]],side:[120,30],back:true,layers:[0,2]},
+    {t:"かおと ひげを かいて できあがり!",draw:[["c",102,94,5],["c",138,94,5],["e",120,104,4,3],["s","M84 104 L60 100 M84 110 L60 114 M156 104 L180 100 M156 110 L180 114","#222",2.5]]}]},
+  kitsune:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"うえの かどを したの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,20]},
+    {t:"ひだりの かどを ななめうえに おりあげる",fold:[[120,224],[92,120]],side:[20,120]},
+    {t:"みぎの かども ななめうえに おりあげる",fold:[[120,224],[148,120]],side:[220,120]},
+    {t:"かおを かいたら コンコン!",draw:[["s","M104 140 Q109 135 114 140 M126 140 Q131 135 136 140","#222",3.5],["e",120,206,5,4]]}]},
+  tulip:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"したの かどを うえの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,220]},
+    {t:"ひだりの かどを ななめうえに おりあげる",fold:[[110,120],[60,80]],side:[20,120]},
+    {t:"みぎの かども ななめうえに おりあげる",fold:[[130,120],[180,80]],side:[220,120]},
+    {t:"うらがえすと はなの できあがり",flip:true},
+    {t:"くきと はっぱを かこう",draw:[["s","M120 120 L120 228","#2E9E5B",6],["g","M120 200 Q92 180 82 150 Q112 160 120 196 Z","#3BB36A"],["g","M120 186 Q150 170 162 140 Q130 152 120 182 Z","#3BB36A"]]}]},
+  koppu:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"したの かどを うえの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,220]},
+    {t:"みぎの かどを ひだりの へりに あわせて おる",fold:[[137.2,120],[161.4,61.4]],side:[220,120]},
+    {t:"ひだりの かども みぎの へりに あわせて おる",fold:[[102.8,120],[78.6,61.4]],side:[20,120]},
+    {t:"うえの 1まいを まえに おりさげる",fold:[[10,61.4],[230,61.4]],side:[120,30],layers:[-1]},
+    {t:"のこりを うしろに おって できあがり!",fold:[[10,61.4],[230,61.4]],side:[120,30],back:true}]},
+  tree:{steps:[
+    {t:"みどりの かみの しろい めんを うえに"},
+    {t:"したの かどを うえの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,220]},
+    {t:"おなじ さんかくを あと 2まい つくって かさねる",draw:[["g","M110 218 L130 218 L130 236 L110 236 Z","#8B5A2B",1],["g","M120 70 L220 170 L20 170 Z","#2E9E5B",1],["g","M120 120 L220 220 L20 220 Z","#2E9E5B",1]]},
+    {t:"ほしと かざりを かいて できあがり!",draw:[["g","M120 4 L126 18 L141 18 L129 27 L134 41 L120 32 L106 41 L111 27 L99 18 L114 18 Z","#F2B61F"],["c",95,100,5],["c",150,150,5],["c",80,195,5],["c",160,205,5],["c",120,165,5]]}]},
+hikouki:{shape:"square",steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"たてに はんぶんに おって もどす",fold:[[120,20],[120,220]],side:[220,120],crease:true},
+    {t:"ひだりうえの かどを まんなかの せんへ",fold:[[120,20],[20,120]],side:[20,20]},
+    {t:"みぎうえの かども まんなかの せんへ",fold:[[120,20],[220,120]],side:[220,20]},
+    {t:"ななめの へりを もういちど まんなかへ",fold:[[120,20],[37.2,220]],side:[22,215]},
+    {t:"みぎも もういちど まんなかへ",fold:[[120,20],[202.8,220]],side:[218,215]},
+    {t:"まんなかで はんぶんに おる",fold:[[120,10],[120,230]],side:[60,200]},
+    {t:"はねを ひろげたら とばそう! びゅーん",replace:[{pts:[[120,24],[214,190],[120,166],[26,190]],up:"C"},{pts:[[120,24],[128,200],[120,214],[112,200]],up:"C"}],clear:true,draw:[["s","M120 24 L120 214","rgba(0,0,0,.35)",1.5],["s","M40 222 L70 222 M170 222 L200 222","#9AA6B2",4]]}]},
+  ouchi:{shape:"square",steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"うえの へりを したの へりに あわせて おる",fold:[[10,120],[230,120]],side:[120,20]},
+    {t:"よこに はんぶんに おって もどす",fold:[[120,110],[120,230]],side:[220,170],crease:true},
+    {t:"ひだりの はしを まんなかの せんへ",fold:[[70,110],[70,230]],side:[20,170]},
+    {t:"みぎの はしも まんなかの せんへ",fold:[[170,110],[170,230]],side:[220,170]},
+    {t:"うえの ふくろを ひらいて つぶすと やねに なる",replace:[{pts:[[70,120],[170,120],[170,220],[70,220]],up:"C"},{pts:[[20,170],[70,120],[120,170]],up:"C"},{pts:[[120,170],[170,120],[220,170]],up:"C"}],clear:true},
+    {t:"まどや ドアを かいたら できあがり!",draw:[["g","M106 186 L134 186 L134 220 L106 220 Z","#FFFFFF"],["g","M58 150 L82 150 L82 166 L58 166 Z","#FFFFFF"],["g","M158 150 L182 150 L182 166 L158 166 Z","#FFFFFF"]]}]},
+  kabuto:{steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"うえの かどを したの かどに あわせて おる",fold:[[10,120],[230,120]],side:[120,20]},
+    {t:"ひだりの かどを したの かどに あわせる",fold:[[60,180],[130,110]],side:[20,120]},
+    {t:"みぎの かども したの かどに あわせる",fold:[[180,180],[110,110]],side:[220,120]},
+    {t:"ひだりの さきを うえの かどまで おりあげる",fold:[[60,170],[180,170]],side:[110,210],layers:[2,4]},
+    {t:"みぎの さきも うえの かどまで おりあげる",fold:[[60,170],[180,170]],side:[130,210],layers:[2,4]},
+    {t:"さきを そとがわに ななめに おって つの",draw:[["g","M118 124 L80 84 L100 150 Z","C"],["g","M122 124 L160 84 L140 150 Z","C"]]},
+    {t:"したの 1まいを すこし おりあげる",fold:[[60,196],[180,196]],side:[120,215],layers:[-1]},
+    {t:"もういちど おりあげる",fold:[[60,172],[180,172]],side:[120,190],layers:[1]},
+    {t:"のこりを うしろに おって できあがり!",fold:[[60,172],[180,172]],side:[120,215],back:true}]},
+  pakupaku:{shape:"square",steps:[
+    {t:"しろい めんを うえに して はじめよう"},
+    {t:"4つの かどを まんなかに あわせて おる",multi:[{fold:[[120,20],[20,120]],side:[20,20]},{fold:[[120,20],[220,120]],side:[220,20]},{fold:[[220,120],[120,220]],side:[220,220]},{fold:[[20,120],[120,220]],side:[20,220]}]},
+    {t:"うらがえす",flip:true},
+    {t:"また 4つの かどを まんなかへ",multi:[{fold:[[10,70],[230,70]],side:[120,22]},{fold:[[10,170],[230,170]],side:[120,218]},{fold:[[70,10],[70,230]],side:[22,120]},{fold:[[170,10],[170,230]],side:[218,120]}]},
+    {t:"はんぶんに おって おりめを つける",fold:[[10,120],[230,120]],side:[120,40],crease:true},
+    {t:"したから ゆびを いれて パクパク!",replace:[{pts:[[40,108],[120,40],[200,108],[120,96]],up:"C"},{pts:[[40,132],[120,144],[200,132],[120,200]],up:"C"}],clear:true,draw:[["c",100,74,6],["c",140,74,6],["s","M70 120 L170 120","rgba(0,0,0,.25)",2]]}]}
+};
+/* ===================== ここまで コンテンツ ===================== */
+
+const FACES=[{v:3,e:"😆",t:"たのしい"},{v:2,e:"🙂",t:"まあまあ"},{v:1,e:"😣",t:"むずかしい"}];
+const NEXT=[{v:"もういちど おりたい",e:"🔁",t:"もういちど"},{v:"つぎも がんばる",e:"💪",t:"がんばる"},{v:"じぶんで おりたい",e:"✋",t:"じぶんで"},{v:"ちがう いろで",e:"🎨",t:"ちがう いろ"}];
+const SELF=[{v:1,t:"いっしょに おった"},{v:2,t:"すこし じぶんで"},{v:3,t:"ぜんぶ じぶんで"}];
+const COLORS=["#D9453B","#F08A24","#F2B61F","#2E9E5B","#3BA7A0","#2F6FD6","#7B5CC9","#E86FA3","#B5651D","#3A3F47"];
+const EMOJIS=["⭐","❤️","🌸","🍀","🐟","🐸","🐻","🐰","🐼","🦋","🐦","🐘","🦒","🍎","🍓","🎁","🚗","🚀","⛵","🎈","☂️","👕","👑","🔷"];
+const STARS={1:"★",2:"★★",3:"★★★"};
+
+const S={tab:"home",view:"main",adult:false,urls:{},ready:false,unavailable:false,
+  records:[],videos:{},custom:{},playId:null,showVideo:false,speak:true,
+  form:{face:null,self:null,next:null,memo:"",photoBlob:null,photoURL:null},saving:false,err:""};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmtDate=s=>{const [,m,d]=s.split("-");return `${+m}がつ${+d}にち`};
+const blob=id=>S.urls[id]||"";
+const getModel=id=>MODELS[id]||S.custom[id]||null;
+const allModels=()=>Object.entries(MODELS).concat(Object.entries(S.custom));
+function toast(t){const el=$("#toast");el.innerHTML=`<div class="toast">${esc(t)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>el.innerHTML="",2200)}
+function say(t){if(!S.speak||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[()()]/g," "));u.lang="ja-JP";u.rate=.9;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}}
+
+/* ===================== おりがみ エンジン ===================== */
+const sdist=(p,a,n)=>(p[0]-a[0])*n[0]+(p[1]-a[1])*n[1];
+function lineN(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return[-dy/L,dx/L]}
+function polyArea(p){let s=0;for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length];s+=p[i][0]*q[1]-q[0]*p[i][1]}return Math.abs(s/2)}
+function clipHalf(pts,a,n,sg){const o=[];for(let i=0;i<pts.length;i++){const p=pts[i],q=pts[(i+1)%pts.length];const dp=sdist(p,a,n)*sg,dq=sdist(q,a,n)*sg;if(dp>=0)o.push(p);if((dp>=0)!==(dq>=0)){const t=dp/(dp-dq);o.push([p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t])}}return o}
+function splitFold(polys,st){const[a,b]=st.fold;const n=lineN(a,b);const sg=Math.sign(sdist(st.side,a,n));const items=[];
+  polys.forEach(P=>{const s=clipHalf(P.pts,a,n,-sg),m=clipHalf(P.pts,a,n,sg);if(polyArea(s)>1)items.push({P:{...P,pts:s},mv:false});if(polyArea(m)>1)items.push({P:{...P,pts:m},mv:true})});
+  if(st.layers){const c=items.filter(x=>x.mv);const pick=new Set(c.slice(...st.layers));c.forEach(x=>{if(!pick.has(x))x.mv=false})}
+  return{stay:items.filter(x=>!x.mv).map(x=>x.P),move:items.filter(x=>x.mv).map(x=>x.P),a,n,back:!!st.back}}
+const reflectK=(p,a,n,k)=>{const d=sdist(p,a,n);return[p[0]-k*d*n[0],p[1]-k*d*n[1]]};
+function moveAt(sp,e){const c=Math.cos(Math.PI*e),k=1-c;let mv=sp.move.map(P=>({pts:P.pts.map(p=>reflectK(p,sp.a,sp.n,k)),up:c>=0?P.up:P.down,down:c>=0?P.down:P.up}));return c<0?mv.reverse():mv}
+const foldsOf=st=>st.multi||(st.fold?[st]:[]);
+function multiSplit(polys,st){let rest=polys;const sps=[];foldsOf(st).forEach(f=>{const sp=splitFold(rest,f);sps.push(sp);rest=sp.stay});return{stay:rest,sps}}
+function foldScene(ms,e){let out=ms.stay;ms.sps.forEach(sp=>{const mv=moveAt(sp,e);out=sp.back?mv.concat(out):out.concat(mv)});return out}
+function flipAt(polys,e){const c=Math.cos(Math.PI*e);let r=polys.map(P=>({pts:P.pts.map(p=>[120+(p[0]-120)*c,p[1]]),up:c>=0?P.up:P.down,down:c>=0?P.down:P.up}));return c<0?r.reverse():r}
+const colOf=(v,m)=>v==="C"?m.c:v==="W"?"#FFFFFF":v;
+function startPolys(A,m){const pts=A.shape==="square"?[[20,20],[220,20],[220,220],[20,220]]:[[120,20],[220,120],[120,220],[20,120]];return[A.start==="color"?{pts,up:m.c,down:"#FFFFFF"}:{pts,up:"#FFFFFF",down:m.c}]}
+function getAnim(id){return ANIMS[id]}
+function plState(id,k){const A=getAnim(id),m=getModel(id);let polys=startPolys(A,m);let draws=[];
+  A.steps.slice(0,k+1).forEach(st=>{
+    if(st.crease){draws.push(["s",`M${st.fold[0][0]} ${st.fold[0][1]} L${st.fold[1][0]} ${st.fold[1][1]}`,"rgba(0,0,0,.3)",1.5])}
+    else if(foldsOf(st).length)polys=foldScene(multiSplit(polys,st),1);
+    if(st.flip)polys=flipAt(polys,1);
+    if(st.replace){polys=st.replace.map(P=>({pts:P.pts,up:colOf(P.up,m),down:colOf(P.down||"W",m)}));if(st.clear)draws=[]}
+    if(st.draw)draws.push(...st.draw.map(d=>d.map(v=>colOf(v,m))))});
+  return{polys,draws}}
+function polySVG(P,op){return`<polygon points="${P.pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="${P.up}" stroke="rgba(40,40,40,.45)" stroke-width="1.5" stroke-linejoin="round"${op!=null&&op<1?` opacity="${op.toFixed(2)}"`:""}/>`}
+function drawSVG(d,op){if(d[0]==="c")return`<circle cx="${d[1]}" cy="${d[2]}" r="${d[3]}" fill="#222" opacity="${op}"/>`;if(d[0]==="e")return`<ellipse cx="${d[1]}" cy="${d[2]}" rx="${d[3]}" ry="${d[4]}" fill="#222" opacity="${op}"/>`;if(d[0]==="g")return`<path d="${d[1]}" fill="${d[2]}" stroke="rgba(40,40,40,.4)" stroke-width="1.5" stroke-linejoin="round" opacity="${op}"/>`;return`<path d="${d[1]}" fill="none" stroke="${d[2]||"#222"}" stroke-width="${d[3]||4}" stroke-linecap="round" opacity="${op}"/>`}
+const isUnder=d=>d[0]==="g"&&d[3];
+function sceneSVG(polys,draws,fresh,op,ghost,gop){const all=draws.map(d=>[d,1]).concat((fresh||[]).map(d=>[d,op]));return all.filter(x=>isUnder(x[0])).map(x=>drawSVG(...x)).join("")+(ghost||[]).map(P=>polySVG(P,gop)).join("")+polys.map(P=>polySVG(P,ghost?1-gop:1)).join("")+all.filter(x=>!isUnder(x[0])).map(x=>drawSVG(...x)).join("")}
+
+/* ===================== きょう ===================== */
+function todayInfo(){
+  const dates=new Set(S.records.map(r=>r.date));
+  const done=dates.has(todayStr());
+  const day=done?dates.size:dates.size+1;
+  const course=COURSE[(day-1)%COURSE.length];
+  return{day,done,id:course==="free"?null:course};
+}
+
+function render(){
+  const tabs=$("#tabs");tabs.classList.toggle("hide",S.view!=="main");
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===S.tab));
+  const app=$("#app");
+  if(S.view==="play"){app.innerHTML=viewPlay();plMount();return}
+  if(S.view==="record"){app.innerHTML=viewRecord();return}
+  app.innerHTML=`<main>${topBar()}${S.tab==="home"?viewHome():S.tab==="stamps"?viewStamps():viewZukan()}</main>`;
+}
+function topBar(){
+  const d=new Date();
+  return `<div class="top"><span class="date">${d.getMonth()+1}がつ${d.getDate()}にち</span>
+    <button class="adultbtn ${S.adult?"on":""}" id="adultBtn"><span class="fill"></span><span style="position:relative">${S.adult?"🔓 おとな":"🔒 おとな"}</span></button></div>
+    ${S.adult?`<div class="adultbar"><span>おとなモード:どうがの とうろく・さくひん ついか・けす</span><button class="btn" style="padding:6px 12px;font-size:13px" data-act="adultoff">おわる</button></div>`:""}
+    ${S.unavailable?`<p class="note">この ブラウザでは きろくを ほぞんできません。Chrome で ひらいてください。</p>`:""}`;
+}
+function viewHome(){
+  const t=todayInfo();const m=t.id?getModel(t.id):null;
+  const last=t.done?S.records.filter(r=>r.date===todayStr()).slice(-1)[0]:null;
+  let h=`<div class="daybadge"><b>${t.day}</b>にちめ</div>`;
+  if(t.done&&last){
+    const lm=getModel(last.modelId)||{};
+    h+=`<div class="hero">${last.photoId?`<img class="doneimg" src="${blob(last.photoId)}" alt="">`:`<div class="paper xl" style="--c:${lm.c||"#999"}">${lm.e||"🎉"}</div>`}
+      <div class="nm">🎉 できたね!</div><div class="muted">また あした つぎの おりがみ</div></div>
+      <button class="sub" data-act="tab" data-v="zukan">📚 ほかのも おる</button>`;
+    return h;
+  }
+  if(!m){
+    h+=`<button class="hero" data-act="tab" data-v="zukan"><div class="paper xl" style="--c:#9AA6B2">🎨</div><div class="nm">すきなのを えらぼう</div></button>
+      <button class="bigplay" data-act="tab" data-v="zukan">📚 えらぶ</button>`;
+    return h;
+  }
+  h+=`<button class="hero" data-act="play" data-v="${t.id}"><div class="paper xl" style="--c:${m.c}">${m.e}</div><div class="nm">${esc(m.name)}</div></button>
+    <button class="bigplay" data-act="play" data-v="${t.id}">▶ おる</button>
+    <button class="sub" data-act="tab" data-v="zukan">📚 ちがうのに する</button>`;
+  return h;
+}
+
+/* ===================== おる(プレイヤー) ===================== */
+const PL={id:null,k:0,busy:false};
+function playSteps(id){if(ANIMS[id])return ANIMS[id].steps;const m=getModel(id);return[{t:"かみを よういしたら はじめよう"}].concat((m.steps||[]).map(t=>({t})))}
+function viewPlay(){
+  const id=S.playId,m=getModel(id);const v=S.videos[id]||{};const hasVid=!!(v.assetId||v.link);
+  let stage;
+  if(S.showVideo&&v.assetId) stage=`<video controls playsinline autoplay src="${blob(v.assetId)}"></video>`;
+  else if(S.showVideo&&v.link) stage=`<div class="stepcard"><a class="btn" style="background:var(--accent);color:#fff;text-decoration:none;font-size:22px;padding:18px 26px" href="${esc(v.link)}" target="_blank" rel="noopener">🎬 どうがを ひらく</a></div>`;
+  else if(ANIMS[id]) stage=`<svg id="plsvg" viewBox="0 0 240 240" role="img" aria-label="おりかた"></svg>`;
+  else stage=`<div class="stepcard"><span class="num" id="plnum"></span><div class="paper xl" style="--c:${m.c}">${m.e}</div></div>`;
+  let h=`<div class="play">
+    <div class="ptop"><button class="round sm" data-act="back" aria-label="もどる">✕</button>
+      <div class="nm">${m.e} ${esc(m.name)}</div>
+      <button class="round sm ${S.speak?"on":""}" data-act="speak" aria-label="こえ">${S.speak?"🔊":"🔇"}</button>
+      ${hasVid?`<button class="round sm ${S.showVideo?"on":""}" data-act="vid" aria-label="どうが">🎬</button>`:""}</div>
+    <div class="stage">${stage}</div>`;
+  if(!S.showVideo) h+=`<p class="ptext" id="pltext"></p><div class="dots" id="pldots"></div>
+    <div class="pctrl"><button class="round" id="plprev" data-pl="prev" aria-label="もどる">◀</button>
+      <button class="round big" id="plnext" data-pl="next" aria-label="つぎ">▶</button>
+      <button class="round" id="plagain" data-pl="again" aria-label="もういちど">🔁</button></div>`;
+  else h+=`<div class="pctrl" style="margin-top:20px"><button class="round big done" data-act="finish" aria-label="できた">🎉</button></div>`;
+  if(S.adult) h+=adultPlayPanel(id);
+  return h+`</div>`;
+}
+function adultPlayPanel(id){
+  const v=S.videos[id]||{};const can=S.ready;const isC=!!S.custom[id];
+  return `<div class="block" style="margin-top:24px"><h2>🔓 おとな:どうが</h2>
+    ${can?`<div class="row"><label class="btn adult" style="flex:1;text-align:center">🎬 ${v.assetId?"とりなおす":"どうがを いれる"}<input type="file" accept="video/*" data-act="video" data-v="${id}"></label>
+      ${v.assetId?`<button class="btn" data-act="vdel" data-v="${id}">けす</button>`:""}</div>
+      <div style="margin-top:8px"><input type="url" placeholder="または どうがの リンク(YouTube など)" value="${esc(v.link||"")}" data-act="link" data-v="${id}"></div>
+      <p class="note">どうがは この たんまつに ほぞんされます。1〜2ふんの みじかめが おすすめ。</p><p class="err" id="verr"></p>`:`<p class="note">よみこみちゅう…</p>`}
+    ${isC?`<div class="row" style="margin-top:12px"><button class="btn adult" data-act="editmodel" data-v="${id}">✏️ この さくひんを なおす</button></div>`:""}
+    <p class="note">おりかたの ことば(おとなよう):</p><ol class="note" style="padding-left:20px;margin:4px 0 0">${(getModel(id).steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")}</ol>
+    ${getModel(id).tip?`<p class="note">💡 ${esc(getModel(id).tip)}</p>`:""}</div>`;
+}
+function plMount(){if(S.showVideo)return;PL.id=S.playId;PL.busy=false;if(S.keepK!=null){PL.k=Math.min(S.keepK,playSteps(PL.id).length-1);S.keepK=null;plShow();return}PL.k=0;plShow();say(playSteps(PL.id)[0].t)}
+function guideSVG(st){if(!st)return"";const fs=foldsOf(st);if(!fs.length)return"";return fs.map(f=>{const[a,b]=f.fold;const col=f.back||st.back?"#C0392B":"#2F6FD6";return`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${col}" stroke-width="3" stroke-dasharray="8 6"/><circle class="pulse" cx="${f.side[0]}" cy="${f.side[1]}" r="8" fill="${col}"/>`}).join("")}
+function plPaint(html){const svg=document.getElementById("plsvg");if(!svg)return false;svg.innerHTML=html;return true}
+function plShow(){
+  const steps=playSteps(PL.id);
+  if(ANIMS[PL.id]){const s=plState(PL.id,PL.k);plPaint(sceneSVG(s.polys,s.draws)+(PL.busy?"":guideSVG(steps[PL.k+1])))}
+  else{const n=document.getElementById("plnum");if(n)n.textContent=PL.k?PL.k:""}
+  plUI();
+}
+function plUI(){
+  const steps=playSteps(PL.id),last=steps.length-1;const t=document.getElementById("pltext");if(!t)return;
+  t.textContent=steps[PL.k].t;
+  document.getElementById("pldots").innerHTML=steps.slice(1).map((_,i)=>`<i class="${i<PL.k?"on":""}"></i>`).join("");
+  const nx=document.getElementById("plnext");
+  if(PL.k>=last){nx.textContent="🎉";nx.classList.add("done");nx.setAttribute("aria-label","できた")}else{nx.textContent="▶";nx.classList.remove("done");nx.setAttribute("aria-label","つぎ")}
+  document.getElementById("plprev").disabled=PL.busy||PL.k===0;document.getElementById("plagain").disabled=PL.busy||PL.k===0;nx.disabled=PL.busy;
+}
+function plAnimate(k){
+  const steps=playSteps(PL.id);PL.k=k;
+  if(!ANIMS[PL.id]){plShow();say(steps[k].t);return}
+  const st=steps[k];const base=plState(PL.id,k-1);PL.busy=true;plUI();say(st.t);
+  const m=getModel(PL.id);
+  const after=plState(PL.id,k);
+  const dur=st.crease?1800:(foldsOf(st).length||st.flip)?1400:st.replace?1100:800,t0=performance.now();
+  const ms=(!st.crease&&foldsOf(st).length)?multiSplit(base.polys,st):null;
+  const csp=st.crease?multiSplit(base.polys,st):null;
+  const tick=now=>{const t=Math.min(1,(now-t0)/dur);const ez=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;let html;
+    if(ms)html=sceneSVG(foldScene(ms,ez(t)),base.draws);
+    else if(csp){const e=t<.5?ez(t*2)*.92:ez(2-t*2)*.92;html=sceneSVG(foldScene(csp,e),base.draws)}
+    else if(st.flip)html=sceneSVG(flipAt(base.polys,ez(t)),base.draws);
+    else if(st.replace)html=sceneSVG(after.polys,[],(after.draws||[]),ez(t),base.polys,1-ez(t));
+    else html=sceneSVG(base.polys,base.draws,(st.draw||[]).map(d=>d.map(v=>colOf(v,m))),ez(t));
+    if(!plPaint(html)){PL.busy=false;return}
+    if(t<1)requestAnimationFrame(tick);else{PL.busy=false;plShow()}};
+  requestAnimationFrame(tick);
+}
+function goRecord(){
+  try{speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+  S.view="record";S.err="";render();window.scrollTo(0,0);say("できたね! どうだった?");
+}
+
+/* ===================== きろく ===================== */
+function viewRecord(){
+  const m=getModel(S.playId);const f=S.form;
+  return `<main style="padding-bottom:40px">
+    <div class="top"><button class="round sm" data-act="back" aria-label="もどる">✕</button><span></span></div>
+    <div class="rtitle"><div class="big">🎉</div><h1>${esc(m.name)} できたね!</h1></div>
+    <label class="phototile">${f.photoURL?`<img src="${f.photoURL}" alt="">`:`<span>📷</span>しゃしんを とる`}
+      <input type="file" accept="image/*" capture="environment" data-act="photo"></label>
+    <div class="qlabel">どうだった?</div>
+    <div class="faces">${FACES.map(x=>`<button class="face" aria-pressed="${f.face===x.v}" data-act="face" data-v="${x.v}"><span>${x.e}</span>${x.t}</button>`).join("")}</div>
+    <div class="qlabel">つぎは?</div>
+    <div class="nexts">${NEXT.map(x=>`<button class="face" aria-pressed="${f.next===x.v}" data-act="next" data-v="${esc(x.v)}"><span>${x.e}</span>${x.t}</button>`).join("")}</div>
+    <details class="adultbox" ${S.adult?"open":""}><summary>🔓 おとなの きろく(じぶんで おれた?・メモ)</summary>
+      <div class="row" style="margin-top:12px">${SELF.map(x=>`<button class="choice" aria-pressed="${f.self===x.v}" data-act="self" data-v="${x.v}">${x.t}</button>`).join("")}</div>
+      <textarea rows="2" style="margin-top:10px" data-act="memo" placeholder="「みみが じょうずに おれた」など">${esc(f.memo)}</textarea></details>
+    ${S.err?`<p class="err">${esc(S.err)}</p>`:""}
+    
+    <button class="savebtn" data-act="save" ${(S.saving||!S.ready)?"disabled":""}>${S.saving?"ほぞんちゅう…":"⭕ きろく する"}</button>
+  </main>`;
+}
+async function shrink(file){try{const bmp=await createImageBitmap(file);const k=Math.min(1,1400/Math.max(bmp.width,bmp.height));const c=document.createElement("canvas");c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.85))}catch(e){return file}}
+/* ===================== ほぞん(たんまつの なか:IndexedDB) ===================== */
+const IDB={db:null};
+function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open("maiorigami",1);r.onupgradeneeded=()=>{const d=r.result;["records","videos","models","blobs"].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n)})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function tx(st,mode,fn){return new Promise((res,rej)=>{const t=IDB.db.transaction(st,mode);fn(t.objectStore(st));t.oncomplete=()=>res();t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)})}
+const put=(st,k,v)=>tx(st,"readwrite",s=>s.put(v,k));
+const del=(st,k)=>tx(st,"readwrite",s=>s.delete(k));
+const clearStore=st=>tx(st,"readwrite",s=>s.clear());
+function all(st){return new Promise((res,rej)=>{const out={};const c=IDB.db.transaction(st).objectStore(st).openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){out[cur.key]=cur.value;cur.continue()}else res(out)};c.onerror=()=>rej(c.error)})}
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+async function putBlob(b){const id=newId();await put("blobs",id,b);S.urls[id]=URL.createObjectURL(b);return id}
+async function delBlob(id){if(!id)return;try{await del("blobs",id)}catch(e){}if(S.urls[id]){URL.revokeObjectURL(S.urls[id]);delete S.urls[id]}}
+async function reload(){const[r,v,m]=await Promise.all([all("records"),all("videos"),all("models")]);
+  S.records=Object.entries(r).map(([k,x])=>({...x,_id:k})).sort((a,b)=>a.createdAt-b.createdAt);S.videos=v;S.custom=m}
+async function loadBlobs(){const b=await all("blobs");for(const[k,v]of Object.entries(b)){if(!S.urls[k])S.urls[k]=URL.createObjectURL(v)}}
+async function refresh(){await reload();if(S.view==="play"){if(PL.busy)return;S.keepK=PL.k}render()}
+
+async function save(){
+  if(!S.ready){S.err="いまは ほぞんできません";render();return}
+  const t=todayInfo();S.saving=true;S.err="";render();
+  try{
+    let photoId=null;if(S.form.photoBlob)photoId=await putBlob(S.form.photoBlob);
+    const m=getModel(S.playId);
+    await put("records",newId(),{day:t.day,date:todayStr(),modelId:S.playId,photoId,face:S.form.face,self:S.form.self,next:S.form.next,memo:S.form.memo.slice(0,500),createdAt:Date.now()});
+    if(S.form.photoURL)URL.revokeObjectURL(S.form.photoURL);
+    S.form={face:null,self:null,next:null,memo:"",photoBlob:null,photoURL:null};
+    await reload();S.saving=false;S.view="main";S.tab="stamps";render();celebrate(m);
+  }catch(e){S.saving=false;S.err="ほぞんに しっぱいしました。もういちど おしてください。";render()}
+}
+function celebrate(m){
+  const cols=COLORS;let conf="";for(let i=0;i<36;i++){conf+=`<i class="conf" style="left:${Math.random()*100}vw;background:${cols[i%cols.length]};animation-duration:${1.6+Math.random()*1.4}s;animation-delay:${Math.random()*.4}s"></i>`}
+  $("#fx").innerHTML=`<div class="celebrate" data-act="fxclose"><div><div class="paper xl" style="--c:${m.c};margin:0 auto">${m.e}</div><h1>スタンプ ぺたん!</h1><p class="muted">タップで とじる</p></div>${conf}</div>`;
+  say("やったね! スタンプ ぺたん!");
+  clearTimeout(celebrate.t);celebrate.t=setTimeout(()=>$("#fx").innerHTML="",3500);
+}
+
+/* ===================== スタンプ ===================== */
+function viewStamps(){
+  const R=S.records,n=R.length;
+  const happy=R.filter(r=>r.face===3).length,solo=R.filter(r=>r.self===3).length;
+  let h=`<div class="headline"><b>${n}</b> こ できた!</div>`;
+  const start=Math.floor(Math.max(n-1,0)/30)*30;let cells="";
+  for(let i=0;i<30;i++){const r=R[start+i];
+    if(r){const m=getModel(r.modelId)||{c:"#888",e:"?"};cells+=`<button class="stamp on" style="background:${m.c}" data-act="rec" data-v="${r._id}">${r.photoId?`<img src="${blob(r.photoId)}" alt="">`:m.e}</button>`}
+    else cells+=`<div class="stamp">${start+i+1}</div>`}
+  h+=`<div class="block"><div class="stamps">${cells}</div>${n>=30?`<p class="note" style="text-align:center">${Math.floor(n/30)}しゅう かんそう!</p>`:""}</div>`;
+  h+=`<div class="block"><h2>おとな むけ</h2><div class="stats">
+    <div class="stat"><b>${n}</b><small>おった かず</small></div><div class="stat"><b>${happy}</b><small>😆 たのしい</small></div><div class="stat"><b>${solo}</b><small>ぜんぶ じぶんで</small></div></div>
+    ${n?`<p class="note">じぶんで おれた ぐあい(たかいほど じぶんで)</p><div class="trend">${R.slice(-40).map(r=>`<i style="height:${(r.self||1)*33}%"></i>`).join("")}</div>`:""}
+    <p class="note">スタンプを タップすると くわしい きろくが みられます。</p></div>`;
+  if(S.adult)h+=`<div class="block"><h2>🔓 バックアップ</h2><p class="note">きろく・しゃしん・ふやした さくひんを ファイルに ほぞんします(どうがは ふくまれません)。ときどき とっておくと あんしんです。</p>
+    <div class="row" style="margin-top:12px"><button class="btn adult" data-act="export">💾 ほぞんする</button><label class="btn">📂 もどす<input type="file" accept="application/json,.json" data-act="import"></label></div></div>`;
+  else h+=`<p class="note" style="text-align:center">バックアップは「🔒 おとな」を ながおし</p>`;
+  return h;
+}
+function openRecord(id){
+  const r=S.records.find(x=>x._id===id);if(!r)return;const m=getModel(r.modelId)||{name:"?",e:"?"};
+  const fc=FACES.find(x=>x.v===r.face),sf=SELF.find(x=>x.v===r.self),nx=NEXT.find(x=>x.v===r.next);
+  $("#sheet").innerHTML=`<div class="sheet-bg" data-act="closebg"><div class="sheet">
+    <div class="sheet-head"><div class="paper sm" style="--c:${m.c}">${m.e}</div><h2>${r.day}にちめ ${esc(m.name)}</h2><button class="close" data-act="close">✕</button></div>
+    ${r.photoId?`<img src="${blob(r.photoId)}" alt="" style="border-radius:14px;margin:0 auto 12px">`:""}
+    <div class="block"><p style="margin:0">${fmtDate(r.date)}</p>
+      ${fc?`<p style="margin:6px 0 0;font-size:20px">${fc.e} ${fc.t}</p>`:""}
+      ${nx?`<p style="margin:6px 0 0">${nx.e} つぎは「${esc(nx.v)}」</p>`:""}
+      ${sf?`<p style="margin:6px 0 0">✋ ${sf.t}</p>`:""}
+      ${r.memo?`<p style="margin:6px 0 0;font-weight:500">📝 ${esc(r.memo)}</p>`:""}</div>
+    <div class="row"><button class="btn" style="flex:1;background:var(--go);color:#fff;font-size:18px" data-act="play" data-v="${r.modelId}">▶ もういちど おる</button></div>
+    ${S.adult?`<button class="btn warn" data-act="del" data-v="${r._id}">この きろくを けす</button>`:""}
+  </div></div>`;
+}
+async function delRec(id){
+  const r=S.records.find(x=>x._id===id);if(!r)return;if(!confirm(`${r.day}にちめの きろくを けしますか?`))return;
+  try{await del("records",id);await delBlob(r.photoId);closeSheet();await refresh()}catch(e){toast("けせませんでした")}
+}
+async function toDataURL(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=()=>rej(f.error);f.readAsDataURL(b)})}
+async function exportBackup(){
+  try{toast("つくっています…");const[r,v,m,b]=await Promise.all([all("records"),all("videos"),all("models"),all("blobs")]);
+    const blobs={};for(const x of Object.values(r)){if(x.photoId&&b[x.photoId])blobs[x.photoId]=await toDataURL(b[x.photoId])}
+    const videos={};for(const[k,x]of Object.entries(v)){if(x.link)videos[k]={link:x.link}}
+    const json=JSON.stringify({app:"maiorigami",v:1,at:Date.now(),records:r,models:m,videos,blobs});
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json],{type:"application/json"}));a.download=`origami-backup-${todayStr()}.json`;document.body.appendChild(a);a.click();a.remove();
+    toast("ほぞんしました")}catch(e){toast("ほぞんできませんでした")}
+}
+async function importBackup(file){
+  try{const d=JSON.parse(await file.text());if(d.app!=="maiorigami")throw 0;
+    if(!confirm("いまの きろくと ふやした さくひんを、バックアップの ないように おきかえますか?"))return;
+    const old=await all("records");for(const x of Object.values(old))await delBlob(x.photoId);
+    await clearStore("records");await clearStore("models");
+    for(const[k,u]of Object.entries(d.blobs||{})){const b=await (await fetch(u)).blob();await put("blobs",k,b);S.urls[k]=URL.createObjectURL(b)}
+    for(const[k,x]of Object.entries(d.records||{}))await put("records",k,x);
+    for(const[k,x]of Object.entries(d.models||{}))await put("models",k,x);
+    const cur=await all("videos");for(const[k,x]of Object.entries(d.videos||{}))await put("videos",k,{...(cur[k]||{}),link:x.link});
+    await refresh();toast("もどしました")}catch(e){toast("この ファイルは よみこめません")}
+}
+
+/* ===================== ずかん ===================== */
+function viewZukan(){
+  let h="";
+  [1,2,3].forEach(l=>{
+    const list=allModels().filter(([,v])=>(v.lv||1)===l);if(!list.length)return;
+    h+=`<div class="lv">${STARS[l]}</div><div class="models">${list.map(([k,v])=>{
+      const cnt=S.records.filter(r=>r.modelId===k).length;
+      return `<button class="mcard" data-act="play" data-v="${k}"><div class="paper md" style="--c:${v.c}">${v.e}</div><div>${esc(v.name)}</div>
+        <div class="s">${cnt?"⭐".repeat(Math.min(cnt,5)):"まだ"}${S.custom[k]?" ・ じぶんで ついか":""}</div></button>`}).join("")}</div>`;
+  });
+  if(S.adult) h+=`<div class="lv" style="color:var(--adult)">おとな</div><div class="models"><button class="mcard add" data-act="newmodel"><span>＋</span>さくひんを ふやす</button></div>`;
+  else h+=`<p class="note" style="text-align:center;margin-top:18px">さくひんを ふやすときは、うえの「🔒 おとな」を ながおし</p>`;
+  return h;
+}
+let MF=null;
+function openModelForm(id){
+  const m=id?S.custom[id]:null;
+  MF={id,name:m?.name||"",e:m?.e||EMOJIS[0],c:m?.c||COLORS[0],lv:m?.lv||1,steps:(m?.steps||[]).join("\n"),tip:m?.tip||""};
+  paintModelForm();
+}
+function paintModelForm(){
+  $("#sheet").innerHTML=`<div class="sheet-bg" data-act="closebg"><div class="sheet">
+    <div class="sheet-head"><h2>${MF.id?"さくひんを なおす":"さくひんを ふやす"}</h2><button class="close" data-act="close">✕</button></div>
+    <label class="f">なまえ(ひらがな)</label><input type="text" maxlength="20" data-mf="name" value="${esc(MF.name)}" placeholder="れい:かえる">
+    <label class="f">マーク</label><div class="emojis">${EMOJIS.map(x=>`<button class="em" aria-pressed="${MF.e===x}" data-act="mfe" data-v="${x}">${x}</button>`).join("")}</div>
+    <label class="f">かみの いろ</label><div class="swatches">${COLORS.map(x=>`<button class="sw" style="background:${x}" aria-pressed="${MF.c===x}" data-act="mfc" data-v="${x}" aria-label="いろ"></button>`).join("")}</div>
+    <label class="f">むずかしさ</label><div class="row">${[1,2,3].map(l=>`<button class="choice" aria-pressed="${MF.lv===l}" data-act="mfl" data-v="${l}">${STARS[l]}</button>`).join("")}</div>
+    <label class="f">おりかた(1ぎょうに 1つ)</label><textarea rows="6" data-mf="steps" placeholder="さんかくに おる&#10;りょうはしを おる&#10;かおを かこう">${esc(MF.steps)}</textarea>
+    <label class="f">ひとこと メモ(なくても OK)</label><input type="text" maxlength="80" data-mf="tip" value="${esc(MF.tip)}">
+    <p class="note">ほぞんしたら、この さくひんの がめんで どうがも いれられます。</p><p class="err" id="mferr"></p>
+    <div class="row" style="margin-top:14px"><button class="btn adult" style="flex:1;font-size:18px" data-act="mfsave">ほぞん</button>
+      ${MF.id?`<button class="btn warn" data-act="mfdel">けす</button>`:""}</div>
+  </div></div>`;
+}
+async function saveModel(){
+  const steps=MF.steps.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,15);
+  if(!MF.name.trim()){$("#mferr").textContent="なまえを いれてください";return}
+  if(!steps.length){$("#mferr").textContent="おりかたを 1つ いじょう いれてください";return}
+  const data={name:MF.name.trim().slice(0,20),e:MF.e,c:MF.c,lv:MF.lv,steps,tip:MF.tip.trim().slice(0,80),createdAt:Date.now()};
+  try{await put("models",MF.id||("u_"+newId()),data);toast(MF.id?"なおしたよ":"ずかんに ふえたよ");closeSheet();await refresh()}catch(e){$("#mferr").textContent="ほぞんに しっぱいしました"}
+}
+async function deleteModel(){
+  if(!MF.id||!confirm("この さくひんを けしますか?(きろくは のこります)"))return;
+  const id=MF.id;try{await del("models",id);closeSheet();if(S.playId===id)S.view="main";await refresh()}catch(e){toast("けせませんでした")}
+}
+function closeSheet(){$("#sheet").innerHTML="";MF=null}
+
+/* ===================== どうが ===================== */
+async function uploadVideo(id,file){
+  const err=$("#verr");
+  if(file.size>300*1024*1024){err.textContent="おおきすぎます。みじかく とるか、リンクで いれてください。";return}
+  err.textContent="ほぞんちゅう…";
+  try{const old=S.videos[id]?.assetId;const bid=await putBlob(file);await put("videos",id,{...(S.videos[id]||{}),assetId:bid});if(old)await delBlob(old);toast("どうがを いれたよ");await refresh()}catch(e){err.textContent="ほぞんに しっぱいしました(たんまつの ようりょうを たしかめてください)"}
+}
+async function deleteVideo(id){const v=S.videos[id];if(!v?.assetId||!confirm("どうがを けしますか?"))return;
+  try{await put("videos",id,{...v,assetId:null});await delBlob(v.assetId);S.showVideo=false;toast("けしたよ");await refresh()}catch(e){toast("けせませんでした")}}
+async function saveLink(id,val){val=val.trim();if(val&&!/^https:\/\//.test(val)){toast("https:// から はじまる リンクを");return}
+  try{await put("videos",id,{...(S.videos[id]||{}),link:val});toast("リンクを ほぞんしたよ");await refresh()}catch(e){toast("ほぞんできませんでした")}}
+
+/* ===================== そうさ ===================== */
+function startPlay(id){if(!getModel(id))return;closeSheet();S.playId=id;S.showVideo=false;S.view="play";render();window.scrollTo(0,0)}
+document.addEventListener("click",e=>{
+  const tb=e.target.closest("nav.tabs button");if(tb){S.tab=tb.dataset.tab;render();window.scrollTo(0,0);return}
+  const pl=e.target.closest("[data-pl]");
+  if(pl&&!PL.busy&&PL.id){const last=playSteps(PL.id).length-1;const a=pl.dataset.pl;
+    if(a==="next"){if(PL.k>=last)goRecord();else plAnimate(PL.k+1)}
+    else if(a==="prev"&&PL.k>0){PL.k--;plShow();say(playSteps(PL.id)[PL.k].t)}
+    else if(a==="again"&&PL.k>0)plAnimate(PL.k);return}
+  const el=e.target.closest("[data-act]");if(!el)return;const a=el.dataset.act,v=el.dataset.v;
+  if(a==="tab"){S.tab=v;S.view="main";render();window.scrollTo(0,0)}
+  else if(a==="play")startPlay(v);
+  else if(a==="back"){try{speechSynthesis.cancel()}catch(e){}S.view="main";render()}
+  else if(a==="speak"){S.speak=!S.speak;if(!S.speak)try{speechSynthesis.cancel()}catch(e){};const b=el;b.classList.toggle("on",S.speak);b.textContent=S.speak?"🔊":"🔇"}
+  else if(a==="vid"){S.showVideo=!S.showVideo;render()}
+  else if(a==="finish")goRecord();
+  else if(a==="face"){S.form.face=+v;render();say(FACES.find(x=>x.v===+v).t)}
+  else if(a==="next"){S.form.next=S.form.next===v?null:v;render();const n=NEXT.find(x=>x.v===v);if(S.form.next&&n)say(n.v)}
+  else if(a==="self"){S.form.self=+v;render()}
+  else if(a==="save")save();
+  else if(a==="fxclose")$("#fx").innerHTML="";
+  else if(a==="rec")openRecord(v);
+  else if(a==="del")delRec(v);
+  else if(a==="close")closeSheet();
+  else if(a==="closebg"&&e.target===el)closeSheet();
+  else if(a==="adultoff"){S.adult=false;render()}
+  else if(a==="newmodel")openModelForm(null);
+  else if(a==="editmodel")openModelForm(v);
+  else if(a==="mfe"){MF.e=v;paintModelForm()}
+  else if(a==="mfc"){MF.c=v;paintModelForm()}
+  else if(a==="mfl"){MF.lv=+v;paintModelForm()}
+  else if(a==="mfsave")saveModel();
+  else if(a==="mfdel")deleteModel();
+  else if(a==="vdel")deleteVideo(v);
+  else if(a==="export")exportBackup();
+});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.act==="memo")S.form.memo=t.value;if(t.dataset.mf&&MF)MF[t.dataset.mf]=t.value});
+document.addEventListener("change",async e=>{const el=e.target,a=el.dataset.act;
+  if(a==="photo"&&el.files[0]){const b=await shrink(el.files[0]);if(S.form.photoURL)URL.revokeObjectURL(S.form.photoURL);S.form.photoBlob=b;S.form.photoURL=URL.createObjectURL(b);render()}
+  else if(a==="video"&&el.files[0])uploadVideo(el.dataset.v,el.files[0]);
+  else if(a==="link")saveLink(el.dataset.v,el.value);
+  else if(a==="import"&&el.files[0]){importBackup(el.files[0]);el.value=""}});
+/* おとなボタン:ながおし */
+let holdT=null;
+document.addEventListener("pointerdown",e=>{const b=e.target.closest("#adultBtn");if(!b)return;
+  if(S.adult){S.adult=false;render();return}
+  b.classList.add("hold");holdT=setTimeout(()=>{holdT=null;S.adult=true;render();toast("おとなモード")},1100)});
+const cancelHold=e=>{const b=document.getElementById("adultBtn");if(holdT){clearTimeout(holdT);holdT=null;if(b)b.classList.remove("hold");if(e.type==="pointerup")toast("おとなは ながおし してね")}};
+["pointerup","pointerleave","pointercancel"].forEach(t=>document.addEventListener(t,cancelHold));
+document.addEventListener("contextmenu",e=>{if(e.target.closest("#adultBtn"))e.preventDefault()});
+
+render();
+(async()=>{
+  try{IDB.db=await idbOpen();try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+    await reload();await loadBlobs();S.ready=true;render()}catch(e){S.unavailable=true;render()}
+})();
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
