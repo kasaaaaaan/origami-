@@ -129,6 +129,16 @@ details.adultbox summary{font-size:16px;color:var(--adult);cursor:pointer}
 .savebtn{display:block;width:100%;margin-top:22px;border:0;border-radius:999px;background:var(--ok);color:#fff;font-size:30px;font-weight:900;padding:18px;box-shadow:0 6px 0 color-mix(in srgb,var(--ok) 70%,#000)}
 .savebtn:disabled{opacity:.5}
 
+/* camera */
+.cam{position:fixed;inset:0;z-index:55;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.cam video{width:100%;max-height:72vh;object-fit:contain;background:#000}
+.cam .bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:560px;padding:18px 24px}
+.cam .shutter{width:96px;height:96px;border-radius:50%;border:6px solid #fff;background:var(--go);font-size:40px;color:#fff}
+.cam .shutter:active{transform:scale(.92)}
+.cam .side{width:64px;height:64px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:24px;display:grid;place-items:center}
+.cam .msg{color:#fff;text-align:center;padding:24px;font-size:18px}
+@keyframes flash{from{opacity:1}to{opacity:0}}
+.cam .flash{position:absolute;inset:0;background:#fff;animation:flash .35s ease-out forwards;pointer-events:none}
 /* celebrate */
 .celebrate{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);display:grid;place-items:center;text-align:center}
 @keyframes stamp{0%{transform:scale(3) rotate(-20deg);opacity:0}60%{transform:scale(.9) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
@@ -321,7 +331,7 @@ const blob=id=>S.urls[id]||"";
 const getModel=id=>MODELS[id]||S.custom[id]||null;
 const allModels=()=>Object.entries(MODELS).concat(Object.entries(S.custom));
 function toast(t){const el=$("#toast");el.innerHTML=`<div class="toast">${esc(t)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>el.innerHTML="",2200)}
-function say(t){if(!S.speak||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[()()]/g," "));u.lang="ja-JP";u.rate=.9;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}}
+function say(t){}
 
 /* ===================== おりがみ エンジン ===================== */
 const sdist=(p,a,n)=>(p[0]-a[0])*n[0]+(p[1]-a[1])*n[1];
@@ -413,7 +423,6 @@ function viewPlay(){
   let h=`<div class="play">
     <div class="ptop"><button class="round sm" data-act="back" aria-label="もどる">✕</button>
       <div class="nm">${m.e} ${esc(m.name)}</div>
-      <button class="round sm ${S.speak?"on":""}" data-act="speak" aria-label="こえ">${S.speak?"🔊":"🔇"}</button>
       ${hasVid?`<button class="round sm ${S.showVideo?"on":""}" data-act="vid" aria-label="どうが">🎬</button>`:""}</div>
     <div class="stage">${stage}</div>`;
   if(!S.showVideo) h+=`<p class="ptext" id="pltext"></p><div class="dots" id="pldots"></div>
@@ -482,8 +491,7 @@ function viewRecord(){
   return `<main style="padding-bottom:40px">
     <div class="top"><button class="round sm" data-act="back" aria-label="もどる">✕</button><span></span></div>
     <div class="rtitle"><div class="big">🎉</div><h1>${esc(m.name)} できたね!</h1></div>
-    <label class="phototile">${f.photoURL?`<img src="${f.photoURL}" alt="">`:`<span>📷</span>しゃしんを とる`}
-      <input type="file" accept="image/*" capture="environment" data-act="photo"></label>
+    <button class="phototile" style="width:100%" data-act="cam">${f.photoURL?`<img src="${f.photoURL}" alt=""><div style="margin-top:8px;font-size:16px">📷 とりなおす</div>`:`<span>📷</span>しゃしんを とる`}</button>
     <div class="qlabel">どうだった?</div>
     <div class="faces">${FACES.map(x=>`<button class="face" aria-pressed="${f.face===x.v}" data-act="face" data-v="${x.v}"><span>${x.e}</span>${x.t}</button>`).join("")}</div>
     <div class="qlabel">つぎは?</div>
@@ -525,6 +533,33 @@ async function save(){
     await reload();S.saving=false;S.view="main";S.tab="stamps";render();celebrate(m);
   }catch(e){S.saving=false;S.err="ほぞんに しっぱいしました。もういちど おしてください。";render()}
 }
+/* ===================== カメラ ===================== */
+let CAM=null;
+async function openCam(){
+  const fx=$("#fx");
+  fx.innerHTML=`<div class="cam"><video id="camv" autoplay playsinline muted></video><p class="msg" id="cammsg">カメラを じゅんびちゅう…</p>
+    <div class="bar"><button class="side" data-act="camclose" aria-label="とじる">✕</button>
+      <button class="shutter" data-act="shoot" aria-label="とる">📷</button>
+      <label class="side" aria-label="ファイルから えらぶ">🖼️<input type="file" accept="image/*" data-act="photo"></label></div></div>`;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$("#cammsg").textContent="この たんまつでは カメラが つかえません。🖼️ から えらんでください";return}
+  try{
+    CAM=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:960}},audio:false});
+    const v=$("#camv");v.srcObject=CAM;$("#cammsg").remove();
+  }catch(e){const m=$("#cammsg");if(m)m.textContent="カメラを つかう きょかが ありません。Chrome の せっていで カメラを「きょか」に してください。🖼️ から えらぶことも できます"}
+}
+function closeCam(){if(CAM){CAM.getTracks().forEach(t=>t.stop());CAM=null}$("#fx").innerHTML=""}
+async function shoot(){
+  const v=$("#camv");if(!v||!CAM||!v.videoWidth)return;
+  const k=Math.min(1,1400/Math.max(v.videoWidth,v.videoHeight));
+  const c=document.createElement("canvas");c.width=Math.round(v.videoWidth*k);c.height=Math.round(v.videoHeight*k);
+  c.getContext("2d").drawImage(v,0,0,c.width,c.height);
+  const cam=$(".cam");if(cam){const f=document.createElement("div");f.className="flash";cam.appendChild(f)}
+  const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.85));if(!b)return;
+  if(S.form.photoURL)URL.revokeObjectURL(S.form.photoURL);
+  S.form.photoBlob=b;S.form.photoURL=URL.createObjectURL(b);
+  setTimeout(()=>{closeCam();render();say("いい しゃしん!")},300);
+}
+
 function celebrate(m){
   const cols=COLORS;let conf="";for(let i=0;i<36;i++){conf+=`<i class="conf" style="left:${Math.random()*100}vw;background:${cols[i%cols.length]};animation-duration:${1.6+Math.random()*1.4}s;animation-delay:${Math.random()*.4}s"></i>`}
   $("#fx").innerHTML=`<div class="celebrate" data-act="fxclose"><div><div class="paper xl" style="--c:${m.c};margin:0 auto">${m.e}</div><h1>スタンプ ぺたん!</h1><p class="muted">タップで とじる</p></div>${conf}</div>`;
@@ -662,7 +697,7 @@ document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]");if(!el)return;const a=el.dataset.act,v=el.dataset.v;
   if(a==="tab"){S.tab=v;S.view="main";render();window.scrollTo(0,0)}
   else if(a==="play")startPlay(v);
-  else if(a==="back"){try{speechSynthesis.cancel()}catch(e){}S.view="main";render()}
+  else if(a==="back"){closeCam();try{speechSynthesis.cancel()}catch(e){}S.view="main";render()}
   else if(a==="speak"){S.speak=!S.speak;if(!S.speak)try{speechSynthesis.cancel()}catch(e){};const b=el;b.classList.toggle("on",S.speak);b.textContent=S.speak?"🔊":"🔇"}
   else if(a==="vid"){S.showVideo=!S.showVideo;render()}
   else if(a==="finish")goRecord();
@@ -685,10 +720,13 @@ document.addEventListener("click",e=>{
   else if(a==="mfdel")deleteModel();
   else if(a==="vdel")deleteVideo(v);
   else if(a==="export")exportBackup();
+  else if(a==="cam")openCam();
+  else if(a==="camclose")closeCam();
+  else if(a==="shoot")shoot();
 });
 document.addEventListener("input",e=>{const t=e.target;if(t.dataset.act==="memo")S.form.memo=t.value;if(t.dataset.mf&&MF)MF[t.dataset.mf]=t.value});
 document.addEventListener("change",async e=>{const el=e.target,a=el.dataset.act;
-  if(a==="photo"&&el.files[0]){const b=await shrink(el.files[0]);if(S.form.photoURL)URL.revokeObjectURL(S.form.photoURL);S.form.photoBlob=b;S.form.photoURL=URL.createObjectURL(b);render()}
+  if(a==="photo"&&el.files[0]){if(CAM||$(".cam"))closeCam();const b=await shrink(el.files[0]);if(S.form.photoURL)URL.revokeObjectURL(S.form.photoURL);S.form.photoBlob=b;S.form.photoURL=URL.createObjectURL(b);render()}
   else if(a==="video"&&el.files[0])uploadVideo(el.dataset.v,el.files[0]);
   else if(a==="link")saveLink(el.dataset.v,el.value);
   else if(a==="import"&&el.files[0]){importBackup(el.files[0]);el.value=""}});
