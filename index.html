@@ -331,7 +331,7 @@ const blob=id=>S.urls[id]||"";
 const getModel=id=>MODELS[id]||S.custom[id]||null;
 const allModels=()=>Object.entries(MODELS).concat(Object.entries(S.custom));
 function toast(t){const el=$("#toast");el.innerHTML=`<div class="toast">${esc(t)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>el.innerHTML="",2200)}
-function say(t){if(!S.speak||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[()()]/g," "));u.lang="ja-JP";u.rate=.9;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}}
+function say(t){}
 
 /* ===================== おりがみ エンジン ===================== */
 const sdist=(p,a,n)=>(p[0]-a[0])*n[0]+(p[1]-a[1])*n[1];
@@ -383,7 +383,7 @@ function render(){
 }
 function topBar(){
   const d=new Date();
-  return `<div class="top"><span class="date">${d.getMonth()+1}がつ${d.getDate()}にち</span>
+  return `<div class="top"><span class="date">${d.getMonth()+1}がつ${d.getDate()}にち <small style="opacity:.5">v4</small></span>
     <button class="adultbtn ${S.adult?"on":""}" id="adultBtn"><span class="fill"></span><span style="position:relative">${S.adult?"🔓 おとな":"🔒 おとな"}</span></button></div>
     ${S.adult?`<div class="adultbar"><span>おとなモード:どうがの とうろく・さくひん ついか・けす</span><button class="btn" style="padding:6px 12px;font-size:13px" data-act="adultoff">おわる</button></div>`:""}
     ${S.unavailable?`<p class="note">この ブラウザでは きろくを ほぞんできません。Chrome で ひらいてください。</p>`:""}`;
@@ -423,7 +423,6 @@ function viewPlay(){
   let h=`<div class="play">
     <div class="ptop"><button class="round sm" data-act="back" aria-label="もどる">✕</button>
       <div class="nm">${m.e} ${esc(m.name)}</div>
-      <button class="round sm ${S.speak?"on":""}" data-act="speak" aria-label="こえ">${S.speak?"🔊":"🔇"}</button>
       ${hasVid?`<button class="round sm ${S.showVideo?"on":""}" data-act="vid" aria-label="どうが">🎬</button>`:""}</div>
     <div class="stage">${stage}</div>`;
   if(!S.showVideo) h+=`<p class="ptext" id="pltext"></p><div class="dots" id="pldots"></div>
